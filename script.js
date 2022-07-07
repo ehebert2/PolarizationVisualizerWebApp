@@ -20,6 +20,16 @@ const axisColor = "#dddddd";
 
 window.addEventListener('load', initialize);
 
+window.onresize = function () {
+    clearTimeout(doit);
+    doit = setTimeout(windowResize, 300);
+};
+
+var doit;
+function windowResize() {
+    
+}
+
 function initialize() {
 
     initialWaveformManager = new WaveformManager('profile_initial', 'viewport_initial', frequency, 0, Math.sqrt(2)/2, Math.sqrt(2)/2);
@@ -133,10 +143,13 @@ class ProfileDrawing {
         this.context.stroke();
 
         this.context.strokeStyle = xColor;
+        this.context.fillStyle = xColor;
         this.xPath.drawProfileView(this.context);
         this.context.strokeStyle = 'green';
+        this.context.fillStyle = 'green';
         this.yPath.drawProfileView(this.context);
         this.context.strokeStyle = xyColor;
+        this.context.fillStyle = xyColor;
         this.xyPath.drawProfileView(this.context);
     }
 
@@ -207,12 +220,15 @@ class SideDrawing {
         this.context.stroke();
 
         this.context.strokeStyle = yColor;
+        this.context.fillStyle = yColor;
         this.yPath.drawSideView(this.context);
 
         this.context.strokeStyle = xColor;
+        this.context.fillStyle = xColor;
         this.xPath.drawSideView(this.context);
 
         this.context.strokeStyle = xyColor;
+        this.context.fillStyle = xyColor;
         this.xyPath.drawSideView(this.context);
 
         this.context.lineWidth = 2;
@@ -267,6 +283,7 @@ class PathNode {
 
 class Path {
     constructor(xCenter, yCenter, length) {
+        this.circleRadius = 2;
         this.length = length;
         this.xCenter = xCenter;
         this.yCenter = yCenter;
@@ -318,6 +335,9 @@ class Path {
 
     drawSideView(context) {
         this.temp = this.firstNode;
+
+        context.fillRect(this.temp.content[0] - this.circleRadius, this.temp.content[1] - this.circleRadius, 2 * this.circleRadius + 1, 2 * this.circleRadius + 1);
+
         context.beginPath();
         context.moveTo(this.temp.content[0], this.temp.content[1]);
 
@@ -335,6 +355,9 @@ class Path {
 
     drawProfileView(context) {
         this.temp = this.firstNode;
+
+        context.fillRect(this.temp.content[0] - this.circleRadius, this.temp.content[1] - this.circleRadius, 2 * this.circleRadius + 1, 2 * this.circleRadius + 1);
+
         context.beginPath();
         context.moveTo(this.temp.content[0], this.temp.content[1]);
 
