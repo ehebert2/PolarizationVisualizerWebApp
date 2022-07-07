@@ -1,5 +1,5 @@
 var initialWaveformManager, finalWaveformManager;
-var padding = 5;
+var padding = 10;
 var FPS = 60;
 var frequency = 0.4;
 var c = 3;
@@ -7,6 +7,8 @@ var delay = 0;
 var polAngle = 45;
 var spokeSpacing = 15;
 var textPadding = 20;
+const sideViewBlockRadius = 2;
+const profileViewBlockRadius = 4;
 
 var state = 0;
 const LINEAR = 0;
@@ -114,7 +116,7 @@ class ProfileDrawing {
         this.canvas.height = this.canvas.parentElement.clientHeight;
         this.context = this.canvas.getContext('2d');
 
-        this.axisWidth = (this.canvas.width > this.canvas.height) ? ((this.canvas.height - textPadding - 2 * padding) / 2) : ((this.canvas.width - textPadding - 2 * padding) / 2);
+        this.axisWidth = (this.canvas.width > this.canvas.height) ? Math.round((this.canvas.height - textPadding - 2 * padding) / 2) : Math.round((this.canvas.width - textPadding - 2 * padding) / 2);
         this.xCenter = Math.round(this.canvas.width / 2) - textPadding;
         this.yCenter = Math.round(this.canvas.height / 2) + textPadding;
 
@@ -142,11 +144,12 @@ class ProfileDrawing {
         this.context.lineTo((this.xCenter + this.axisWidth), this.yCenter);
         this.context.stroke();
 
+        this.context.lineWidth = 4;
         this.context.strokeStyle = xColor;
         this.context.fillStyle = xColor;
         this.xPath.drawProfileView(this.context);
-        this.context.strokeStyle = 'green';
-        this.context.fillStyle = 'green';
+        this.context.strokeStyle = yColor;
+        this.context.fillStyle = yColor;
         this.yPath.drawProfileView(this.context);
         this.context.strokeStyle = xyColor;
         this.context.fillStyle = xyColor;
@@ -195,8 +198,8 @@ class SideDrawing {
         this.context.fillStyle = "White";
         this.context.fillText("Ey", this.xCenter - textPadding, this.yCenter - this.yAxisHeight - textPadding);
         this.context.fillText("Ex", this.xCenter - this.xAxisHeight - textPadding, this.yCenter + this.xAxisHeight);
-        this.blankSquare1 = [this.xCenter - this.xAxisHeight - padding, this.yCenter - this.yAxisHeight - padding, this.opticAxisLength + 2 * this.xAxisHeight + 2 * padding, 2 * this.yAxisHeight + this.xAxisHeight + 2*padding];
-        this.blankSquare2 = [this.xCenter, this.blankSquare1[1] - this.xAxisHeight - padding, this.opticAxisLength + this.xAxisHeight + padding, this.xAxisHeight + padding];
+        this.blankSquare1 = [this.xCenter - this.xAxisHeight - 2, this.yCenter - this.yAxisHeight - 2, this.opticAxisLength + 2 * this.xAxisHeight + 2 * 2, 2 * this.yAxisHeight + this.xAxisHeight + 4];
+        this.blankSquare2 = [this.xCenter, this.blankSquare1[1] - this.xAxisHeight - 2, this.opticAxisLength + this.xAxisHeight + 2, this.xAxisHeight + 2];
     }
 
     draw() {
@@ -336,7 +339,7 @@ class Path {
     drawSideView(context) {
         this.temp = this.firstNode;
 
-        context.fillRect(this.temp.content[0] - this.circleRadius, this.temp.content[1] - this.circleRadius, 2 * this.circleRadius + 1, 2 * this.circleRadius + 1);
+        context.fillRect(this.temp.content[0] - sideViewBlockRadius, this.temp.content[1] - sideViewBlockRadius, 2 * sideViewBlockRadius + 1, 2 * sideViewBlockRadius + 1);
 
         context.beginPath();
         context.moveTo(this.xCenter, this.yCenter);
@@ -357,7 +360,7 @@ class Path {
     drawProfileView(context) {
         this.temp = this.firstNode;
 
-        context.fillRect(this.temp.content[0] - this.circleRadius, this.temp.content[1] - this.circleRadius, 2 * this.circleRadius + 1, 2 * this.circleRadius + 1);
+        context.fillRect(this.temp.content[0] - profileViewBlockRadius, this.temp.content[1] - profileViewBlockRadius, 2 * profileViewBlockRadius + 1, 2 * profileViewBlockRadius + 1);
 
         context.beginPath();
         context.moveTo(this.temp.content[0], this.temp.content[1]);
