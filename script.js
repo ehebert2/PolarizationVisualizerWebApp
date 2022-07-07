@@ -339,7 +339,8 @@ class Path {
         context.fillRect(this.temp.content[0] - this.circleRadius, this.temp.content[1] - this.circleRadius, 2 * this.circleRadius + 1, 2 * this.circleRadius + 1);
 
         context.beginPath();
-        context.moveTo(this.temp.content[0], this.temp.content[1]);
+        context.moveTo(this.xCenter, this.yCenter);
+        context.lineTo(this.temp.content[0], this.temp.content[1]);
 
         for (let i = 1; i < this.length; i++) {
             this.temp = this.temp.nextNode;
