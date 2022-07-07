@@ -13,6 +13,11 @@ const LINEAR = 0;
 const LHCP = 1;
 const RHCP = 1;
 
+const xColor = "#ff0000";
+const yColor = "#00ff00";
+const xyColor = "#0000ff";
+const axisColor = "#dddddd";
+
 window.addEventListener('load', initialize);
 
 function initialize() {
@@ -117,7 +122,7 @@ class ProfileDrawing {
     draw() {
         this.blank();
         this.context.lineWidth = 2;
-        this.context.strokeStyle = "white";
+        this.context.strokeStyle = axisColor;
         this.context.beginPath();
         this.context.moveTo(this.xCenter, (this.yCenter - this.axisWidth));
         this.context.lineTo(this.xCenter, (this.yCenter + this.axisWidth));
@@ -127,11 +132,11 @@ class ProfileDrawing {
         this.context.lineTo((this.xCenter + this.axisWidth), this.yCenter);
         this.context.stroke();
 
-        this.context.strokeStyle = "red";
+        this.context.strokeStyle = xColor;
         this.xPath.drawProfileView(this.context);
-        this.context.strokeStyle = "green";
+        this.context.strokeStyle = 'green';
         this.yPath.drawProfileView(this.context);
-        this.context.strokeStyle = "blue";
+        this.context.strokeStyle = xyColor;
         this.xyPath.drawProfileView(this.context);
     }
 
@@ -185,7 +190,7 @@ class SideDrawing {
         this.blank();
         this.context.lineWidth = 2;
 
-        this.context.strokeStyle = "white";
+        this.context.strokeStyle = axisColor;
         this.context.beginPath();
         this.context.moveTo(this.xCenter, (this.yCenter - this.yAxisHeight));
         this.context.lineTo(this.xCenter, (this.yCenter + this.yAxisHeight));
@@ -201,18 +206,17 @@ class SideDrawing {
         this.context.lineTo((this.xCenter + this.opticAxisLength), (this.yCenter));
         this.context.stroke();
 
-        this.context.lineWidth = 1;
-        this.context.strokeStyle = "green";
+        this.context.strokeStyle = yColor;
         this.yPath.drawSideView(this.context);
 
-        this.context.strokeStyle = "red";
+        this.context.strokeStyle = xColor;
         this.xPath.drawSideView(this.context);
 
-        this.context.strokeStyle = "blue";
+        this.context.strokeStyle = xyColor;
         this.xyPath.drawSideView(this.context);
 
         this.context.lineWidth = 2;
-        this.context.strokeStyle = "White";
+        this.context.strokeStyle = axisColor;
         this.context.beginPath();
         this.context.moveTo((this.xCenter + this.opticAxisLength), (this.yCenter - this.yAxisHeight));
         this.context.lineTo((this.xCenter + this.opticAxisLength), (this.yCenter + this.yAxisHeight));
