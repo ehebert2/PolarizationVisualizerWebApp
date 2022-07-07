@@ -41,6 +41,10 @@ function setCanvasSizes() {
     let properties = window.getComputedStyle(profileInitialCanvas.parentElement, null);
     let targetWidth = parseFloat(properties.height) - 5;
     profileInitialCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
+
+    properties = window.getComputedStyle(profileFinalCanvas.parentElement, null);
+    targetWidth = parseFloat(properties.height) - 5;
+    profileFinalCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
 }
 
 function initialize() {

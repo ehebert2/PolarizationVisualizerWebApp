@@ -1,5 +1,12 @@
+:root {
+    --border_color_1: #750899;
+    --border_color_2: #0d66bf;
+    --panel_background_color: #ffffff;
+    --body_background_color: #d9d9d9;
+}
+
 body {
-    background-color: powderblue;
+    background-color: var(--body_background_color);
     height:100%;
     padding:0px;
     margin:0px;
@@ -7,7 +14,6 @@ body {
 }
 
 .ui_container {
-    background-color: #ffffff;
     width: 100%;
     height: 100vh;
     min-height: 100%;
@@ -17,21 +23,44 @@ body {
     align-items: stretch;
 }
 
-.profile_holder {
+div.visualizer_container {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    flex-direction: column;
     height: 100vh;
+}
+
+div.visualizer_pair_container {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    border-style: solid;
+    border-width: 3px;
+    border-color: var(--border_color_1);
+    background-color: var(--panel_background_color);
+    margin: 5px;
+}
+
+.profile_holder {
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
-    justify-content: center;
+    padding: 0px;
     margin: 5px;
 }
 
 div.profile {
+    height: 100%;
     overflow: hidden;
     background-color: #00ff00;
     border-style: solid;
-    border-color: #0d66bf;
+    border-color: var(--border_color_2);
     border-width: 3px;
     margin: 0px;
     padding: 0px;
@@ -46,25 +75,23 @@ canvas.profile {
 
 .viewport_holder {
     flex: 1;
-    background-color: #ffffff;
     overflow: hidden;
-    margin: 5px;
     display: flex;
     flex-wrap: nowrap;
     align-items: stretch;
     flex-direction: column;
-    justify-content: center;
+    margin: 5px;
 }
 
 div.viewport {
     overflow: hidden;
-    background-color: #0000ff;
+    background-color: #00ff00;
     border-style: solid;
-    border-color: #0d66bf;
+    border-color: var(--border_color_2);
     border-width: 3px;
     padding: 0px;
     margin: 0px;
-    flex: 1
+    flex: 1;
 }
 
 canvas.viewport {
@@ -74,11 +101,11 @@ canvas.viewport {
 }
 
 .controls {
-    background-color: #ffffff;
+    background-color: var(--panel_background_color);
     margin: 2px;
     padding: 10px;
     border-style: solid;
-    border-color: #0d66bf;
+    border-color: var(--border_color_1);
     border-width: 3px;
     line-height: 1.5;
 }
@@ -94,4 +121,9 @@ canvas.viewport {
 .phase_box:focus {
     outline: none;
     border-color: #15a318;
+}
+
+.visualizer_header {
+    padding: 5px;
+    margin: 0px;
 }
