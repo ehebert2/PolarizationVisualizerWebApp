@@ -34,9 +34,8 @@ div.profile {
     border-color: #0d66bf;
     border-width: 3px;
     margin: 0px;
-    height: 40vh;
-    width: 40vh;
     padding: 0px;
+    flex: 1;
 }
 
 canvas.profile {
@@ -65,7 +64,7 @@ div.viewport {
     border-width: 3px;
     padding: 0px;
     margin: 0px;
-    height: 40vh;
+    flex: 1
 }
 
 canvas.viewport {

@@ -32,7 +32,19 @@ function windowResize() {
     
 }
 
+function setCanvasSizes() {
+    let sideInitialCanvas = document.getElementById('viewport_initial');
+    let sideFinalCanvas = document.getElementById('viewport_final');
+    let profileInitialCanvas = document.getElementById('profile_initial');
+    let profileFinalCanvas = document.getElementById('profile_final');
+
+    let properties = window.getComputedStyle(profileInitialCanvas.parentElement, null);
+    let targetWidth = parseFloat(properties.height) - 5;
+    profileInitialCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
+}
+
 function initialize() {
+    setCanvasSizes();
 
     initialWaveformManager = new WaveformManager('profile_initial', 'viewport_initial', frequency, 0, Math.sqrt(2)/2, Math.sqrt(2)/2);
     finalWaveformManager = new WaveformManager('profile_final', 'viewport_final', frequency, delay * Math.PI / 180, Math.sqrt(2) / 2, Math.sqrt(2) / 2);
