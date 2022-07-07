@@ -1,0 +1,100 @@
+body {
+    background-color: powderblue;
+    height:100%;
+    padding:0px;
+    margin:0px;
+    font-family: Verdana;
+}
+
+.ui_container {
+    background-color: #ffffff;
+    width: 100%;
+    height: 100vh;
+    min-height: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+.profile_holder {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: center;
+    margin: 5px;
+}
+
+div.profile {
+    overflow: hidden;
+    background-color: #00ff00;
+    border-radius: 15px;
+    border-style: solid;
+    border-color: #0d66bf;
+    border-width: 3px;
+    margin: 0px;
+    height: 40vh;
+    width: 40vh;
+}
+
+canvas.profile {
+    background-color: #000000;
+    padding: 0px;
+    margin: 0px;
+}
+
+.viewport_holder {
+    flex: 1;
+    background-color: #ffffff;
+    overflow: hidden;
+    margin: 5px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div.viewport {
+    overflow: hidden;
+    background-color: #0000ff;
+    border-radius: 15px;
+    border-style: solid;
+    border-color: #0d66bf;
+    border-width: 3px;
+    padding: 0px;
+    margin: 0px;
+    height: 40vh;
+}
+
+canvas.viewport {
+    background-color: #000000;
+    padding:0px;
+    margin:0px;
+}
+
+.controls {
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin: 2px;
+    padding: 10px;
+    border-style: solid;
+    border-color: #0d66bf;
+    border-width: 3px;
+    line-height: 1.5;
+}
+
+.phase_box {
+    background-color: #ffffff;
+    border-radius: 5px;
+    border-color: #0d66bf;
+    border-width: 3px;
+    margin: 3px;
+}
+
+.phase_box:focus {
+    outline: none;
+    border-color: #15a318;
+}

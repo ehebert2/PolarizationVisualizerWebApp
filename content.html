@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Eric Hebert">
+    <meta name="description" content="A tool for visualizing eliptical polarization states">
+    <title>Polarization Visualizer Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+</head>
+
+<body>
+    <main style="height:100%; min-height:100%;">
+        <div class="ui_container">
+            <div class="controls">
+                <form>
+                    <p style="text-align: left;">
+                        Input Polarization State:<br />
+                        <input type="radio" id="linear" name="in_pol_type" value="LINEAR" checked="checked" onchange="changePolarizationType(this)" />
+                        <label for="linear">Linear</label><br />
+                        <input type="radio" id="lhcp" name="in_pol_type" value="LHCP" onchange="changePolarizationType(this)" />
+                        <label for="lhcp">LHCP</label><br />
+                        <input type="radio" id="rhcp" name="in_pol_type" value="RHCP" onchange="changePolarizationType(this)" />
+                        <label for="rhcp">RHCP</label>
+                    </p>
+                    <p style="text-align: right;">
+                        <label for="input_angle">Polarization Angle (deg): </label>
+                        <input class="phase_box" type="number" id="input_angle" min="-360" max="360" value="45" size="4" maxlength="4" onchange="changePolarizationAngle()" /><br />
+                        <label for="delay">Delay (deg): </label>
+                        <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeDelay()" />
+                    </p>
+                </form>
+            </div>
+            <div class="profile_holder">
+                <p>
+                    Initial (profile View)
+                    <div class="profile">
+                        <canvas class="profile" width="50" height="50" id="profile_initial"></canvas>
+                    </div>
+                </p>
+                <p>
+                    Final (profile View)
+                    <div class="profile">
+                        <canvas class="profile" width="50" height="50" id="profile_final"></canvas>
+                    </div>
+                </p>
+            </div>
+            <div class="viewport_holder">
+                <p>
+                    Initial (Side View)
+                    <div class="viewport">
+                        <canvas class="viewport" width="50" height="50" id="viewport_initial"></canvas>
+                    </div>
+                </p>
+                <p>
+                    Final (Side View)
+                    <div class="viewport">
+                        <canvas class="viewport" width="50" height="50" id="viewport_final"></canvas>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <noscript>Your browser does not support javascript.</noscript>
+</body>
+</html>
