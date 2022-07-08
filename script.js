@@ -8,6 +8,7 @@ var doit;
 var frequency = 0.4;
 var c = 3;
 var delay = 0;
+var inputDelay = 0;
 var polAngle = 45;
 var spokeSpacing = 15;
 var textPadding = 20;
@@ -18,6 +19,7 @@ var state = 0;
 const LINEAR = 0;
 const LHCP = 1;
 const RHCP = 2;
+const ARB = 3;
 
 const xColor = "#ff0000";
 const yColor = "#00ff00";
@@ -86,6 +88,8 @@ function initialize() {
     document.getElementById('delay').value = delay;
     document.getElementById('input_angle').value = polAngle;
     document.getElementById('linear').checked = true;
+    document.getElementById('input_delay').value = inputDelay;
+    document.getElementById('input_delay').disabled = true;
 
     setupCanvas();
 }
@@ -100,32 +104,44 @@ function update() {
 function changePolarizationType(radio) {
     if (radio.value == 'LINEAR') {
         document.getElementById('input_angle').disabled = false;
+        document.getElementById('input_delay').disabled = true;
         state = LINEAR;
         polAngle = document.getElementById('input_angle').value;
         configureWaveformManagers();
     } else if (radio.value == "LHCP") {
         document.getElementById('input_angle').disabled = true;
+        document.getElementById('input_delay').disabled = true;
         state = LHCP;
         configureWaveformManagers();
     } else if (radio.value == "RHCP") {
         document.getElementById('input_angle').disabled = true;
+        document.getElementById('input_delay').disabled = true;
         state = RHCP;
+        configureWaveformManagers();
+    } else if (radio.value == "ARB") {
+        document.getElementById('input_angle').disabled = false;
+        document.getElementById('input_delay').disabled = false;
+        state = ARB;
         configureWaveformManagers();
     }
 }
 
 function changePolarizationAngle() {
-    if (state == LINEAR) {
-        this.polAngle = document.getElementById('input_angle').value;
-        initialWaveformManager.xMag = Math.cos(Math.PI * this.polAngle / 180);
-        initialWaveformManager.yMag = Math.sin(Math.PI * this.polAngle / 180);
-        finalWaveformManager.xMag = initialWaveformManager.xMag;
-        finalWaveformManager.yMag = initialWaveformManager.yMag;
+    if ((state == LINEAR) || (state == ARB)) {
+        polAngle = parseFloat(document.getElementById('input_angle').value);
+        configureWaveformManagers();
+    }
+}
+
+function changeInitialDelay() {
+    if (state == ARB) {
+        inputDelay = parseFloat(document.getElementById('input_delay').value);
+        configureWaveformManagers();
     }
 }
 
 function changeDelay() {
-    delay = document.getElementById('delay').value;
+    delay = parseFloat(document.getElementById('delay').value);
     configureWaveformManagers();
 }
 
@@ -151,6 +167,13 @@ function configureWaveformManagers() {
         finalWaveformManager.xMag = Math.sqrt(2) / 2;
         finalWaveformManager.yMag = Math.sqrt(2) / 2;
         finalWaveformManager.delay = -Math.PI / 2 + delay * Math.PI / 180;
+    } else if (state == ARB) {
+        initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
+        initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
+        initialWaveformManager.delay = inputDelay * Math.PI / 180;
+        finalWaveformManager.xMag = initialWaveformManager.xMag;
+        finalWaveformManager.yMag = initialWaveformManager.yMag;
+        finalWaveformManager.delay = ((inputDelay + delay) * Math.PI / 180);
     }
 }
 

@@ -21,11 +21,16 @@
                         <input type="radio" id="lhcp" name="in_pol_type" value="LHCP" onchange="changePolarizationType(this)" />
                         <label for="lhcp">LHCP</label><br />
                         <input type="radio" id="rhcp" name="in_pol_type" value="RHCP" onchange="changePolarizationType(this)" />
-                        <label for="rhcp">RHCP</label>
+                        <label for="rhcp">RHCP</label><br />
+                        <input type="radio" id="arb" name="in_pol_type" value="ARB" onchange="changePolarizationType(this)" />
+                        <label for="arb">Arbitrary</label>
                     </p>
                     <p style="text-align: right;">
                         <label for="input_angle">Polarization Angle (deg): </label>
                         <input class="phase_box" type="number" id="input_angle" min="-360" max="360" value="45" size="4" maxlength="4" onchange="changePolarizationAngle()" /><br />
+                        <label for="input_delay">Initial Phase Offset (deg): </label>
+                        <input class="phase_box" type="number" id="input_delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeInitialDelay()"/><br />
+                        
                         <label for="delay">Delay (deg): </label>
                         <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeDelay()" />
                     </p>
