@@ -11,6 +11,7 @@ body {
     padding:0px;
     margin:0px;
     font-family: Verdana;
+    font-size: 14px;
 }
 
 .ui_container {
@@ -138,6 +139,10 @@ canvas.viewport {
     .ui_container {
         flex-direction: row-reverse;
     }
+
+    .visualizer_container {
+        height: 100vh;
+    }
 }
 
 @media (orientation: portrait) {
@@ -145,8 +150,12 @@ canvas.viewport {
         flex-direction: column-reverse;
     }
 
+    .profile_holder {
+        flex: 1 1 auto;
+    }
+
     .div.visualizer_container {
-        flex: 1;
+        flex: 4;
     }
 
     .controls {
