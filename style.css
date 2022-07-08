@@ -30,7 +30,6 @@ div.visualizer_container {
     align-items: stretch;
     flex-wrap: nowrap;
     flex-direction: column;
-    height: 100vh;
 }
 
 div.visualizer_pair_container {
@@ -133,4 +132,24 @@ canvas.viewport {
 .visualizer_header {
     padding: 5px;
     margin: 0px;
+}
+
+@media (orientation: landscape) {
+    .ui_container {
+        flex-direction: row-reverse;
+    }
+}
+
+@media (orientation: portrait) {
+    .ui_container {
+        flex-direction: column-reverse;
+    }
+
+    .div.visualizer_container {
+        flex: 1;
+    }
+
+    .controls {
+        flex: 1;
+    }
 }

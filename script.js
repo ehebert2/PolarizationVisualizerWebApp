@@ -78,9 +78,11 @@ function initialize() {
         (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
         document.getElementById("main_container").requestFullscreen()
             .then(function () {
+                window.alert("Success");
                 // element has entered fullscreen mode successfully
             })
             .catch(function (error) {
+                window.alert("Failure");
                 // element could not enter fullscreen mode
                 // error message
                 console.log(error.message);
