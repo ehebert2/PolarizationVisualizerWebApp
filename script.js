@@ -32,6 +32,19 @@ window.onresize = function () {
 };
 
 function resetCanvasSizes() {
+    if (window.width > window.height) {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
+        (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
+            if (!document.fullscreenElement) {
+                document.getElementById("main_container").requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    }
+
     window.cancelAnimationFrame(rafID);
     profileInitialCanvas.width = "100px";
     profileFinalCanvas.width = "100px";
@@ -73,21 +86,6 @@ function initialize() {
     document.getElementById('delay').value = delay;
     document.getElementById('input_angle').value = polAngle;
     document.getElementById('linear').checked = true;
-
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
-        (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
-        document.getElementById("main_container").requestFullscreen()
-            .then(function () {
-                window.alert("Success");
-                // element has entered fullscreen mode successfully
-            })
-            .catch(function (error) {
-                window.alert("Failure");
-                // element could not enter fullscreen mode
-                // error message
-                console.log(error.message);
-            });
-    }
 
     setupCanvas();
 }
