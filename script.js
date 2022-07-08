@@ -4,6 +4,7 @@ var padding = 15;
 var FPS = 60;
 var running = true;
 let rafID;
+var doit;
 var frequency = 0.4;
 var c = 3;
 var delay = 0;
@@ -27,13 +28,8 @@ window.addEventListener('load', initialize);
 
 window.onresize = function () {
     clearTimeout(doit);
-    doit = setTimeout(windowResize, 300);
+    doit = setTimeout(resetCanvasSizes, 300);
 };
-
-var doit;
-function windowResize() {
-    resetCanvasSizes();
-}
 
 function resetCanvasSizes() {
     window.cancelAnimationFrame(rafID);
@@ -77,6 +73,19 @@ function initialize() {
     document.getElementById('delay').value = delay;
     document.getElementById('input_angle').value = polAngle;
     document.getElementById('linear').checked = true;
+
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
+        (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
+        document.getElementById("main_container").requestFullscreen()
+            .then(function () {
+                // element has entered fullscreen mode successfully
+            })
+            .catch(function (error) {
+                // element could not enter fullscreen mode
+                // error message
+                console.log(error.message);
+            });
+    }
 
     setupCanvas();
 }
