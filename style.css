@@ -59,7 +59,7 @@ div.visualizer_pair_container {
 div.profile {
     height: 100%;
     overflow: hidden;
-    background-color: #00ff00;
+    background-color: #000000;
     border-style: solid;
     border-color: var(--border_color_2);
     border-width: 3px;
@@ -89,7 +89,7 @@ canvas.profile {
 
 div.viewport {
     overflow: hidden;
-    background-color: #00ff00;
+    background-color: #000000;
     border-style: solid;
     border-color: var(--border_color_2);
     border-width: 3px;
@@ -110,7 +110,7 @@ canvas.viewport {
 .controls {
     background-color: var(--panel_background_color);
     margin: 5px;
-    padding: 10px;
+    padding: 0px;
     border-style: solid;
     border-color: var(--border_color_1);
     border-width: 3px;
@@ -130,7 +130,20 @@ canvas.viewport {
     border-color: #15a318;
 }
 
+.control_panel {
+    margin: 5px;
+    padding: 5px;
+    border-color: var(--border_color_2);
+    border-width: 3px;
+    border-style: solid;
+}
+
 .visualizer_header {
+    padding: 5px;
+    margin: 0px;
+}
+
+.control_header {
     padding: 5px;
     margin: 0px;
 }

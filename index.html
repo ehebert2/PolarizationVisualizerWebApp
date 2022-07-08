@@ -13,9 +13,9 @@
     <main style="height:100%; min-height:100%;">
         <div class="ui_container" id="main_container">
             <div class="controls">
-                <form>
+                <p class="control_header">Initial Polarization State</p>
+                <form class="control_panel">
                     <p style="text-align: left;">
-                        Input Polarization State:<br />
                         <input type="radio" id="linear" name="in_pol_type" value="LINEAR" checked="checked" onchange="changePolarizationType(this)" />
                         <label for="linear">Linear</label><br />
                         <input type="radio" id="lhcp" name="in_pol_type" value="LHCP" onchange="changePolarizationType(this)" />
@@ -31,9 +31,16 @@
                         <label for="input_delay">Initial Phase Offset (deg): </label>
                         <input class="phase_box" type="number" id="input_delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeInitialDelay()"/><br />
                         
-                        <label for="delay">Delay (deg): </label>
-                        <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeDelay()" />
                     </p>
+                </form>
+                <p class="control_header">Modifications</p>
+                <form class="control_panel">
+                    <label for="delay">Delay (deg): </label>
+                    <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeDelay()" /><br />
+                    <label for="polarizer_angle">Polarizer Angle</label>
+                    <input class="phase_box" type="number" id="polarizer_angle" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changerPolarizerAngle()" /><br />
+                    <label for="polarizerOn">Insert Polarizer</label>
+                    <input type="checkbox" id="polarizerOn" onclick="polarizerToggle()" />
                 </form>
             </div>
             <div class="visualizer_container">

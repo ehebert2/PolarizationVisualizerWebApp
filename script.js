@@ -10,6 +10,8 @@ var c = 3;
 var delay = 0;
 var inputDelay = 0;
 var polAngle = 45;
+var polarizerAngle = 0;
+var polarizerOn = false;
 var spokeSpacing = 15;
 var textPadding = 20;
 const sideViewBlockRadius = 2;
@@ -24,6 +26,7 @@ const ARB = 3;
 const xColor = "#ff0000";
 const yColor = "#00ff00";
 const xyColor = "#0000ff";
+const polColor = "#f0a80e";
 const axisColor = "#dddddd";
 
 window.addEventListener('load', initialize);
@@ -90,6 +93,9 @@ function initialize() {
     document.getElementById('linear').checked = true;
     document.getElementById('input_delay').value = inputDelay;
     document.getElementById('input_delay').disabled = true;
+    document.getElementById('polarizerOn').checked = false;
+    document.getElementById('polarizer_angle').value = polarizerAngle;
+    document.getElementById('polarizer_angle').disabled = true;
 
     setupCanvas();
 }
@@ -128,21 +134,49 @@ function changePolarizationType(radio) {
 
 function changePolarizationAngle() {
     if ((state == LINEAR) || (state == ARB)) {
-        polAngle = parseFloat(document.getElementById('input_angle').value);
+        polAngle = checkNumber(document.getElementById('input_angle'), polAngle);
         configureWaveformManagers();
     }
 }
 
 function changeInitialDelay() {
     if (state == ARB) {
-        inputDelay = parseFloat(document.getElementById('input_delay').value);
+        inputDelay = checkNumber(document.getElementById('input_delay'), inputDelay);
         configureWaveformManagers();
     }
 }
 
 function changeDelay() {
-    delay = parseFloat(document.getElementById('delay').value);
+    delay = checkNumber(document.getElementById('delay'),delay);
     configureWaveformManagers();
+}
+
+function changerPolarizerAngle() {
+    if (polarizerOn) {
+        polarizerAngle = checkNumber(document.getElementById('polarizer_angle'), polarizerAngle);
+        configureWaveformManagers();
+    }
+}
+
+function polarizerToggle() {
+    if (document.getElementById('polarizerOn').checked) {
+        polarizerOn = true;
+        document.getElementById('polarizer_angle').disabled = false;
+        configureWaveformManagers();
+    } else {
+        polarizerOn = false;
+        document.getElementById('polarizer_angle').disabled = true;
+        configureWaveformManagers();
+    }
+}
+
+function checkNumber(elem, def) {
+    if (elem.value.length == 0) {
+        elem.value = def;
+        return def;
+    } else {
+        return parseFloat(elem.value);
+    }
 }
 
 function configureWaveformManagers() {
@@ -156,17 +190,17 @@ function configureWaveformManagers() {
     } else if (state == LHCP) {
         initialWaveformManager.xMag = Math.sqrt(2) / 2;
         initialWaveformManager.yMag = Math.sqrt(2) / 2;
-        initialWaveformManager.delay = Math.PI / 2;
-        finalWaveformManager.xMag = Math.sqrt(2) / 2;
-        finalWaveformManager.yMag = Math.sqrt(2) / 2;
-        finalWaveformManager.delay = Math.PI / 2 + delay * Math.PI / 180;
-    } else if (state == RHCP) {
-        initialWaveformManager.xMag = Math.sqrt(2) / 2;
-        initialWaveformManager.yMag = Math.sqrt(2) / 2;
         initialWaveformManager.delay = -Math.PI / 2;
         finalWaveformManager.xMag = Math.sqrt(2) / 2;
         finalWaveformManager.yMag = Math.sqrt(2) / 2;
         finalWaveformManager.delay = -Math.PI / 2 + delay * Math.PI / 180;
+    } else if (state == RHCP) {
+        initialWaveformManager.xMag = Math.sqrt(2) / 2;
+        initialWaveformManager.yMag = Math.sqrt(2) / 2;
+        initialWaveformManager.delay = Math.PI / 2;
+        finalWaveformManager.xMag = Math.sqrt(2) / 2;
+        finalWaveformManager.yMag = Math.sqrt(2) / 2;
+        finalWaveformManager.delay = Math.PI / 2 + delay * Math.PI / 180;
     } else if (state == ARB) {
         initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
         initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
@@ -174,6 +208,16 @@ function configureWaveformManagers() {
         finalWaveformManager.xMag = initialWaveformManager.xMag;
         finalWaveformManager.yMag = initialWaveformManager.yMag;
         finalWaveformManager.delay = ((inputDelay + delay) * Math.PI / 180);
+    }
+
+    if (polarizerOn) {
+        finalWaveformManager.profileDrawing.polarizerOn = true;
+        finalWaveformManager.profileDrawing.setPolarizerAngle(polarizerAngle * Math.PI / 180);
+        finalWaveformManager.sideDrawing.polarizerOn = true;
+        finalWaveformManager.sideDrawing.setPolarizerAngle(polarizerAngle * Math.PI / 180);
+    } else {
+        finalWaveformManager.profileDrawing.polarizerOn = false;
+        finalWaveformManager.sideDrawing.polarizerOn = false;
     }
 }
 
@@ -198,6 +242,11 @@ class ProfileDrawing {
         this.yPath = new Path(this.xCenter, this.yCenter, this.length);
         this.xyPath = new Path(this.xCenter, this.yCenter, this.length);
 
+        this.polarizerOn = false;
+        this.alphaC = 0;
+        this.alphaS = 0;
+        this.polarizerProjMag = 0;
+
         this.context.font = "14px serif";
         this.context.fillStyle = "White";
         this.context.fillText("Ey", this.xCenter, textPadding + padding)
@@ -218,27 +267,47 @@ class ProfileDrawing {
         this.context.stroke();
 
         this.context.lineWidth = 4;
-        this.context.strokeStyle = xColor;
-        this.context.fillStyle = xColor;
-        this.xPath.drawProfileView(this.context);
-        this.context.strokeStyle = yColor;
-        this.context.fillStyle = yColor;
-        this.yPath.drawProfileView(this.context);
-        this.context.strokeStyle = xyColor;
-        this.context.fillStyle = xyColor;
-        this.xyPath.drawProfileView(this.context);
+        if (this.polarizerOn) {
+            this.context.strokeStyle = xyColor;
+            this.context.fillStyle = xyColor;
+            this.xyPath.drawProfileView(this.context);
+            this.context.strokeStyle = polColor;
+            this.context.fillStyle = polColor;
+            this.xPath.drawProfileView(this.context);
+        } else {
+            this.context.strokeStyle = xColor;
+            this.context.fillStyle = xColor;
+            this.xPath.drawProfileView(this.context);
+            this.context.strokeStyle = yColor;
+            this.context.fillStyle = yColor;
+            this.yPath.drawProfileView(this.context);
+            this.context.strokeStyle = xyColor;
+            this.context.fillStyle = xyColor;
+            this.xyPath.drawProfileView(this.context);
+        }
     }
 
     addPoint(x, y) {
         this.point = [Math.round(this.xCenter + this.axisWidth * x), Math.round(this.yCenter - this.axisWidth * y)];
-        this.xPath.appendAndRemove([this.point[0], this.yCenter]);
-        this.yPath.appendAndRemove([this.xCenter, this.point[1]]);
         this.xyPath.appendAndRemove(this.point);
+        if (this.polarizerOn) {
+            this.polarizerProjMag = this.alphaC * x + this.alphaS * y;
+            this.xPath.appendAndRemove([Math.round(this.xCenter + this.axisWidth * this.polarizerProjMag * this.alphaC), Math.round(this.yCenter - this.axisWidth * this.polarizerProjMag * this.alphaS)]);
+            this.yPath.appendAndRemove([this.xCenter, this.yCenter]);
+        } else {
+            this.xPath.appendAndRemove([this.point[0], this.yCenter]);
+            this.yPath.appendAndRemove([this.xCenter, this.point[1]]);
+        }
+    }
+
+    setPolarizerAngle(angle) {
+        this.alphaC = Math.cos(angle);
+        this.alphaS = Math.sin(angle);
     }
 
     blank() {
         this.context.fillStyle = "black";
-        this.context.fillRect(this.xCenter-this.axisWidth-2, this.yCenter-this.axisWidth-2, 2*this.axisWidth+4, 2*this.axisWidth+4);
+        this.context.fillRect(this.xCenter - this.axisWidth - profileViewBlockRadius - 1, this.yCenter - this.axisWidth - profileViewBlockRadius - 1, 2 * (this.axisWidth + profileViewBlockRadius + 1), 2 * (this.axisWidth + profileViewBlockRadius + 1));
     }
 }
 
@@ -266,6 +335,11 @@ class SideDrawing {
         this.xPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength/c);
         this.yPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength/c);
         this.xyPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength / c);
+
+        this.polarizerOn = false;
+        this.alphaC = 0;
+        this.alphaS = 0;
+        this.polarizerProjMag = 0;
 
         this.context.font = "14px serif";
         this.context.fillStyle = "White";
@@ -295,17 +369,27 @@ class SideDrawing {
         this.context.lineTo((this.xCenter + this.opticAxisLength), (this.yCenter));
         this.context.stroke();
 
-        this.context.strokeStyle = yColor;
-        this.context.fillStyle = yColor;
-        this.yPath.drawSideView(this.context);
+        if (this.polarizerOn) {
+            this.context.strokeStyle = xyColor;
+            this.context.fillStyle = xyColor;
+            this.xyPath.drawSideView(this.context);
 
-        this.context.strokeStyle = xColor;
-        this.context.fillStyle = xColor;
-        this.xPath.drawSideView(this.context);
+            this.context.strokeStyle = polColor;
+            this.context.fillStyle = polColor;
+            this.xPath.drawSideView(this.context);
+        } else {
+            this.context.strokeStyle = yColor;
+            this.context.fillStyle = yColor;
+            this.yPath.drawSideView(this.context);
 
-        this.context.strokeStyle = xyColor;
-        this.context.fillStyle = xyColor;
-        this.xyPath.drawSideView(this.context);
+            this.context.strokeStyle = xColor;
+            this.context.fillStyle = xColor;
+            this.xPath.drawSideView(this.context);
+
+            this.context.strokeStyle = xyColor;
+            this.context.fillStyle = xyColor;
+            this.xyPath.drawSideView(this.context);
+        }
 
         this.context.lineWidth = 2;
         this.context.strokeStyle = axisColor;
@@ -324,11 +408,18 @@ class SideDrawing {
         this.getRealCoord(x, y, z);
         this.xyPath.appendAndRemove([this.realX, this.realY]);
 
-        this.getRealCoord(x, 0, z);
-        this.xPath.appendAndRemove([this.realX, this.realY]);
+        if (this.polarizerOn) {
+            this.polarizerProjMag = this.alphaC * x + this.alphaS * y;
+            this.getRealCoord((this.polarizerProjMag * this.alphaC), (this.polarizerProjMag * this.alphaS), z);
+            this.xPath.appendAndRemove([this.realX, this.realY]);
+            this.yPath.appendAndRemove([this.xCenter, this.yCenter]);
+        } else {
+            this.getRealCoord(x, 0, z);
+            this.xPath.appendAndRemove([this.realX, this.realY]);
 
-        this.getRealCoord(0, y, z);
-        this.yPath.appendAndRemove([this.realX, this.realY]);
+            this.getRealCoord(0, y, z);
+            this.yPath.appendAndRemove([this.realX, this.realY]);
+        }
     }
 
     shift(displacement) {
@@ -340,6 +431,11 @@ class SideDrawing {
     getRealCoord(x, y, z) {
         this.realX = Math.round(this.xCenter + z - this.projScale * x * this.yAxisHeight);
         this.realY = Math.round(this.yCenter + this.yAxisHeight*(this.projScale * x - y));
+    }
+
+    setPolarizerAngle(angle) {
+        this.alphaC = Math.cos(angle);
+        this.alphaS = Math.sin(angle);
     }
 
     blank() {
@@ -464,7 +560,7 @@ class WaveformManager {
         this.sideDrawing.shift(c);
 
         this.phase = 2 * Math.PI * this.frequency * this.frame / FPS;
-        this.x0 = this.xMag*Math.sin(this.phase + this.delay);
+        this.x0 = this.xMag*Math.sin(this.phase - this.delay);
         this.y0 = this.yMag*Math.sin(this.phase);
 
         this.sideDrawing.addPoint(this.x0, this.y0, 0);
