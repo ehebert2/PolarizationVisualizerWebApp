@@ -1,6 +1,9 @@
 var initialWaveformManager, finalWaveformManager;
-var padding = 10;
+var profileInitialCanvas, profileFinalCanvas, sideInitialCanvas, sideFinalCanvas;
+var padding = 15;
 var FPS = 60;
+var running = true;
+let rafID;
 var frequency = 0.4;
 var c = 3;
 var delay = 0;
@@ -13,7 +16,7 @@ const profileViewBlockRadius = 4;
 var state = 0;
 const LINEAR = 0;
 const LHCP = 1;
-const RHCP = 1;
+const RHCP = 2;
 
 const xColor = "#ff0000";
 const yColor = "#00ff00";
@@ -29,73 +32,76 @@ window.onresize = function () {
 
 var doit;
 function windowResize() {
-    
+    resetCanvasSizes();
 }
 
-function setCanvasSizes() {
-    let sideInitialCanvas = document.getElementById('viewport_initial');
-    let sideFinalCanvas = document.getElementById('viewport_final');
-    let profileInitialCanvas = document.getElementById('profile_initial');
-    let profileFinalCanvas = document.getElementById('profile_final');
+function resetCanvasSizes() {
+    window.cancelAnimationFrame(rafID);
+    profileInitialCanvas.width = "100px";
+    profileFinalCanvas.width = "100px";
+    profileInitialCanvas.height = "100px";
+    profileFinalCanvas.height = "100px";
+    profileInitialCanvas.parentElement.parentElement.style.flex = "0 0 100";
+    profileFinalCanvas.parentElement.parentElement.style.flex = "0 0 100";
+    profileInitialCanvas.parentElement.parentElement.style.flex = "1 1 auto";
+    profileFinalCanvas.parentElement.parentElement.style.flex = "1 1 auto";
 
+    initialWaveformManager = null;
+    finalWaveformManager = null;
+
+    setTimeout(setupCanvas, 500);
+}
+
+function setupCanvas() {
     let properties = window.getComputedStyle(profileInitialCanvas.parentElement, null);
-    let targetWidth = parseFloat(properties.height) - 5;
+    let targetWidth = Math.ceil(parseFloat(properties.height)) - 5;
     profileInitialCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
 
     properties = window.getComputedStyle(profileFinalCanvas.parentElement, null);
-    targetWidth = parseFloat(properties.height) - 5;
+    targetWidth = Math.ceil(parseFloat(properties.height)) - 5;
     profileFinalCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
+
+    initialWaveformManager = new WaveformManager('profile_initial', 'viewport_initial', frequency, 0, Math.sqrt(2) / 2, Math.sqrt(2) / 2);
+    finalWaveformManager = new WaveformManager('profile_final', 'viewport_final', frequency, delay * Math.PI / 180, Math.sqrt(2) / 2, Math.sqrt(2) / 2);
+    configureWaveformManagers();
+
+    rafID = window.requestAnimationFrame(update);
 }
 
 function initialize() {
-    setCanvasSizes();
-
-    initialWaveformManager = new WaveformManager('profile_initial', 'viewport_initial', frequency, 0, Math.sqrt(2)/2, Math.sqrt(2)/2);
-    finalWaveformManager = new WaveformManager('profile_final', 'viewport_final', frequency, delay * Math.PI / 180, Math.sqrt(2) / 2, Math.sqrt(2) / 2);
+    profileInitialCanvas = document.getElementById('profile_initial');
+    profileFinalCanvas = document.getElementById('profile_final');
+    sideInitialCanvas = document.getElementById('viewport_initial');
+    sideFinalCanvas = document.getElementById('viewport_final');
 
     document.getElementById('delay').value = delay;
     document.getElementById('input_angle').value = polAngle;
     document.getElementById('linear').checked = true;
 
-    window.requestAnimationFrame(update);
+    setupCanvas();
 }
 
 function update() {
     initialWaveformManager.update();
     finalWaveformManager.update();
 
-    window.requestAnimationFrame(update);
+    rafID = window.requestAnimationFrame(update);
 }
 
 function changePolarizationType(radio) {
     if (radio.value == 'LINEAR') {
         document.getElementById('input_angle').disabled = false;
         state = LINEAR;
-        this.polAngle = document.getElementById('input_angle').value;
-        initialWaveformManager.xMag = Math.cos(Math.PI * this.polAngle / 180);
-        initialWaveformManager.yMag = Math.sin(Math.PI * this.polAngle / 180);
-        initialWaveformManager.delay = 0;
-        finalWaveformManager.xMag = initialWaveformManager.xMag;
-        finalWaveformManager.yMag = initialWaveformManager.yMag;
-        finalWaveformManager.delay = delay*Math.PI/180;
+        polAngle = document.getElementById('input_angle').value;
+        configureWaveformManagers();
     } else if (radio.value == "LHCP") {
         document.getElementById('input_angle').disabled = true;
         state = LHCP;
-        initialWaveformManager.xMag = Math.sqrt(2) / 2;
-        initialWaveformManager.yMag = Math.sqrt(2) / 2;
-        initialWaveformManager.delay = Math.PI / 2;
-        finalWaveformManager.xMag = Math.sqrt(2) / 2;
-        finalWaveformManager.yMag = Math.sqrt(2) / 2;
-        finalWaveformManager.delay = Math.PI / 2 + delay*Math.PI/180;
+        configureWaveformManagers();
     } else if (radio.value == "RHCP") {
         document.getElementById('input_angle').disabled = true;
         state = RHCP;
-        initialWaveformManager.xMag = Math.sqrt(2) / 2;
-        initialWaveformManager.yMag = Math.sqrt(2) / 2;
-        initialWaveformManager.delay = -Math.PI / 2;
-        finalWaveformManager.xMag = Math.sqrt(2) / 2;
-        finalWaveformManager.yMag = Math.sqrt(2) / 2;
-        finalWaveformManager.delay = -Math.PI / 2 + delay*Math.PI/180;
+        configureWaveformManagers();
     }
 }
 
@@ -111,12 +117,31 @@ function changePolarizationAngle() {
 
 function changeDelay() {
     delay = document.getElementById('delay').value;
+    configureWaveformManagers();
+}
+
+function configureWaveformManagers() {
     if (state == LINEAR) {
-        finalWaveformManager.delay = delay*Math.PI/180;
+        initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
+        initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
+        initialWaveformManager.delay = 0;
+        finalWaveformManager.xMag = initialWaveformManager.xMag;
+        finalWaveformManager.yMag = initialWaveformManager.yMag;
+        finalWaveformManager.delay = delay * Math.PI / 180;
     } else if (state == LHCP) {
-        finalWaveformManager.delay = delay * Math.PI / 180 + Math.PI / 2;
+        initialWaveformManager.xMag = Math.sqrt(2) / 2;
+        initialWaveformManager.yMag = Math.sqrt(2) / 2;
+        initialWaveformManager.delay = Math.PI / 2;
+        finalWaveformManager.xMag = Math.sqrt(2) / 2;
+        finalWaveformManager.yMag = Math.sqrt(2) / 2;
+        finalWaveformManager.delay = Math.PI / 2 + delay * Math.PI / 180;
     } else if (state == RHCP) {
-        finalWaveformManager.delay = delay * Math.PI / 180 - Math.PI / 2;
+        initialWaveformManager.xMag = Math.sqrt(2) / 2;
+        initialWaveformManager.yMag = Math.sqrt(2) / 2;
+        initialWaveformManager.delay = -Math.PI / 2;
+        finalWaveformManager.xMag = Math.sqrt(2) / 2;
+        finalWaveformManager.yMag = Math.sqrt(2) / 2;
+        finalWaveformManager.delay = -Math.PI / 2 + delay * Math.PI / 180;
     }
 }
 
@@ -133,7 +158,7 @@ class ProfileDrawing {
         this.context = this.canvas.getContext('2d');
 
         this.axisWidth = (this.canvas.width > this.canvas.height) ? Math.round((this.canvas.height - textPadding - 2 * padding) / 2) : Math.round((this.canvas.width - textPadding - 2 * padding) / 2);
-        this.xCenter = Math.round(this.canvas.width / 2) - textPadding;
+        this.xCenter = Math.round((this.canvas.width) / 2) - textPadding;
         this.yCenter = Math.round(this.canvas.height / 2) + textPadding;
 
         this.length = Math.round(FPS / (frequency * 10));

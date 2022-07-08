@@ -7,7 +7,7 @@
 
 body {
     background-color: var(--body_background_color);
-    height:100%;
+    height:100vh;
     padding:0px;
     margin:0px;
     font-family: Verdana;
@@ -16,11 +16,12 @@ body {
 .ui_container {
     width: 100%;
     height: 100vh;
-    min-height: 100%;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: nowrap;
     align-items: stretch;
+    margin: 0px;
+    padding: 0px;
 }
 
 div.visualizer_container {
@@ -65,6 +66,9 @@ div.profile {
     margin: 0px;
     padding: 0px;
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 canvas.profile {
@@ -92,6 +96,9 @@ div.viewport {
     padding: 0px;
     margin: 0px;
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 canvas.viewport {
@@ -102,7 +109,7 @@ canvas.viewport {
 
 .controls {
     background-color: var(--panel_background_color);
-    margin: 2px;
+    margin: 5px;
     padding: 10px;
     border-style: solid;
     border-color: var(--border_color_1);
