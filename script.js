@@ -13,7 +13,10 @@ var polAngle = 45;
 var polarizerAngle = 0;
 var polarizerOn = false;
 var spokeSpacing = 15;
-var textPadding = 20;
+var xTextPadding = 20;
+var yTextPadding = 15;
+var padding = 5;
+var labelFont = "14px serif";
 const sideViewBlockRadius = 2;
 const profileViewBlockRadius = 4;
 
@@ -37,27 +40,6 @@ window.onresize = function () {
 };
 
 function resetCanvasSizes() {
-    if (window.width > window.height) {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
-            (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
-            if (!document.fullscreenElement) {
-                window.alert("trying to set full screen");
-                document.getElementById("main_container").requestFullscreen('hide').catch(err => {
-                    alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
-    } else {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
-            (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-        }
-    }
-
     window.cancelAnimationFrame(rafID);
     profileInitialCanvas.width = "100px";
     profileFinalCanvas.width = "100px";
@@ -75,6 +57,14 @@ function resetCanvasSizes() {
 }
 
 function setupCanvas() {
+    let tempCanvas = document.getElementById('viewport_initial');
+    let tempContext = tempCanvas.getContext('2d');
+    tempContext.font = labelFont;
+    let metrics = tempContext.measureText('Ex');
+    xTextPadding = metrics.width;
+    metrics = tempContext.measureText('Ey');
+    yTextPadding = parseInt(tempContext.font);
+
     let properties = window.getComputedStyle(profileInitialCanvas.parentElement, null);
     let targetWidth = Math.ceil(parseFloat(properties.height)) - 5;
     profileInitialCanvas.parentElement.parentElement.style.flex = "0 0 " + targetWidth + "px";
@@ -272,9 +262,11 @@ class ProfileDrawing {
         this.canvas.height = this.canvas.parentElement.clientHeight;
         this.context = this.canvas.getContext('2d');
 
-        this.axisWidth = (this.canvas.width > this.canvas.height) ? Math.round((this.canvas.height - textPadding - 2 * padding) / 2) : Math.round((this.canvas.width - textPadding - 2 * padding) / 2);
-        this.xCenter = Math.round((this.canvas.width) / 2) - textPadding;
-        this.yCenter = Math.round(this.canvas.height / 2) + textPadding;
+        this.axisWidth = (this.canvas.width > this.canvas.height) ? Math.round((this.canvas.height - yTextPadding - 3 * padding) / 2) : Math.round((this.canvas.width - xTextPadding - 3 * padding) / 2);
+        //this.xCenter = Math.round((this.canvas.width) / 2) - xTextPadding - padding;
+        //this.yCenter = Math.round(this.canvas.height / 2) + yTextPadding + padding;
+        this.xCenter = padding + this.axisWidth;
+        this.yCenter = 2 * padding + yTextPadding + this.axisWidth;
 
         this.length = Math.round(FPS / (frequency * 10));
         this.xPath = new Path(this.xCenter, this.yCenter, this.length);
@@ -286,9 +278,9 @@ class ProfileDrawing {
         this.alphaS = 0;
         this.polarizerProjMag = 0;
 
-        this.context.font = "14px serif";
+        this.context.font = labelFont;
         this.context.fillStyle = "White";
-        this.context.fillText("Ey", this.xCenter, textPadding + padding)
+        this.context.fillText("Ey", this.xCenter, this.yCenter - this.axisWidth - padding-0.3*yTextPadding);
         this.context.fillText("Ex", this.xCenter + this.axisWidth + padding, this.yCenter);
     }
 
@@ -354,10 +346,6 @@ class SideDrawing {
     
     constructor(canvasID) {
         this.canvasID = canvasID;
-        this.initialize();
-    }
-
-    initialize() {
         this.canvas = document.getElementById(this.canvasID);
         this.canvas.width = this.canvas.parentElement.clientWidth;
         this.canvas.height = this.canvas.parentElement.clientHeight;
@@ -365,10 +353,10 @@ class SideDrawing {
 
         this.projScale = 0.6;
 
-        this.yAxisHeight = Math.round((this.canvas.height-2*padding) / (2 * (1 + this.projScale)));
-        this.xCenter = textPadding + padding + Math.round(this.yAxisHeight * this.projScale);
+        this.yAxisHeight = Math.round((this.canvas.height - 2 * padding) / (2 * (1 + this.projScale)));
+        this.xCenter = xTextPadding + 2 * padding + Math.round(this.yAxisHeight * this.projScale);
         this.yCenter = padding + Math.round(this.yAxisHeight * (1 + this.projScale));
-        this.opticAxisLength = this.canvas.width - 2 * (this.xCenter + padding) - textPadding;
+        this.opticAxisLength = this.canvas.width - 2 * (this.xCenter) + xTextPadding + padding;
         this.xAxisHeight = Math.round(this.yAxisHeight * this.projScale);
 
         this.xPath = new Path(this.xCenter, this.yCenter, Math.round(this.opticAxisLength / c));
@@ -380,11 +368,11 @@ class SideDrawing {
         this.alphaS = 0;
         this.polarizerProjMag = 0;
 
-        this.context.font = "14px serif";
+        this.context.font = labelFont;
         this.context.fillStyle = "White";
-        this.context.fillText("Ey", this.xCenter - textPadding, this.yCenter - this.yAxisHeight - textPadding);
-        this.context.fillText("Ex", this.xCenter - this.xAxisHeight - textPadding, this.yCenter + this.xAxisHeight);
-        this.blankSquare1 = [this.xCenter - this.xAxisHeight - 2, this.yCenter - this.yAxisHeight - 2, this.opticAxisLength + 2 * this.xAxisHeight + 2 * 2, 2 * this.yAxisHeight + this.xAxisHeight + 4];
+        this.context.fillText("Ey", this.xCenter - xTextPadding, this.yCenter - this.yAxisHeight - padding);
+        this.context.fillText("Ex", this.xCenter - this.xAxisHeight - xTextPadding - padding, this.yCenter + this.xAxisHeight);
+        this.blankSquare1 = [this.xCenter - this.xAxisHeight - 2, this.yCenter - this.yAxisHeight - 2, this.opticAxisLength + 2 * this.xAxisHeight + 4, 2 * this.yAxisHeight + this.xAxisHeight + 4];
         this.blankSquare2 = [this.xCenter, this.blankSquare1[1] - this.xAxisHeight - 2, this.opticAxisLength + this.xAxisHeight + 2, this.xAxisHeight + 2];
     }
 
