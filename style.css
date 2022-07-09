@@ -160,6 +160,10 @@ canvas.viewport {
 }
 
 @media (orientation: portrait) {
+    .body {
+        font-size: 1em;
+    }
+
     .ui_container {
         display: grid;
         grid-template-rows: 3fr 2fr;
