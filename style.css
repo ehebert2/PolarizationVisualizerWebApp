@@ -1,3 +1,7 @@
+/*  Eric Hebert 2022. Used for polarization visualizer web app.
+    Intended for educational purpuses.
+    I don't understand CSS. It's a bit glitch, but it will have to do. */
+
 :root {
     --border_color_1: #750899;
     --border_color_2: #0d66bf;
