@@ -96,6 +96,8 @@ function initialize() {
     document.getElementById('polarizerOn').checked = false;
     document.getElementById('polarizer_angle').value = polarizerAngle;
     document.getElementById('polarizer_angle').disabled = true;
+    document.getElementById('wave_speed').value = c;
+    document.getElementById('frequency').value = frequency;
 
     setupCanvas();
 }
@@ -155,6 +157,35 @@ function changerPolarizerAngle() {
     if (polarizerOn) {
         polarizerAngle = checkNumber(document.getElementById('polarizer_angle'), polarizerAngle);
         configureWaveformManagers();
+    }
+}
+
+function changeSpeed() {
+    let elem = document.getElementById('wave_speed');
+    if (elem.value.length == 0) {
+        elem.value = c;
+    } else {
+        let tempC = Math.round(parseFloat(elem.value));
+        if ((tempC > 0) && (tempC < window.innerWidth / 10)) {
+            window.cancelAnimationFrame(rafID);
+            c = tempC;
+            initialWaveformManager.changeSpeed();
+            finalWaveformManager.changeSpeed();
+            rafID = window.requestAnimationFrame(update);
+        } else {
+            elem.value = c;
+        }
+    }
+}
+
+function changeFrequency() {
+    let tempF = checkNumber(document.getElementById('frequency'), frequency);
+    if (tempF > 0) {
+        frequency = tempF;
+        initialWaveformManager.frequency = frequency;
+        finalWaveformManager.frequency = frequency;
+    } else {
+        document.getElementById('frequency').value = frequency;
     }
 }
 
@@ -332,9 +363,9 @@ class SideDrawing {
         this.opticAxisLength = this.canvas.width - 2 * (this.xCenter + padding) - textPadding;
         this.xAxisHeight = Math.round(this.yAxisHeight * this.projScale);
 
-        this.xPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength/c);
-        this.yPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength/c);
-        this.xyPath = new Path(this.xCenter, this.yCenter, this.opticAxisLength / c);
+        this.xPath = new Path(this.xCenter, this.yCenter, Math.round(this.opticAxisLength / c));
+        this.yPath = new Path(this.xCenter, this.yCenter, Math.round(this.opticAxisLength / c));
+        this.xyPath = new Path(this.xCenter, this.yCenter, Math.round(this.opticAxisLength / c));
 
         this.polarizerOn = false;
         this.alphaC = 0;
@@ -438,6 +469,12 @@ class SideDrawing {
         this.alphaS = Math.sin(angle);
     }
 
+    changeSpeed() {
+        this.xPath.changeLength(Math.round(this.opticAxisLength / c));
+        this.yPath.changeLength(Math.round(this.opticAxisLength / c));
+        this.xyPath.changeLength(Math.round(this.opticAxisLength / c));
+    }
+
     blank() {
         this.context.fillStyle = "black";
         this.context.fillRect(this.blankSquare1[0], this.blankSquare1[1], this.blankSquare1[2], this.blankSquare1[3]);
@@ -470,19 +507,26 @@ class Path {
     }
 
     removeLast() {
-        temp = lastNode;
-        lastNode = lastNode.previousNode;
-        lastNode.nextNode = null;
-        temp.previousNode = null;
-        length--;
+        this.temp = null;
+        this.temp = this.lastNode;
+        this.lastNode = this.lastNode.previousNode;
+        this.lastNode.nextNode = null;
+        this.temp.previousNode = null;
+        this.length--;
     }
 
     appendToStart(content) {
-        temp.content = content;
-        temp.nextNode = firstNode;
-        firstNode.previousNode = temp;
-        firstNode = temp;
-        length++;
+        this.temp = new PathNode(content, null, this.firstNode);
+        this.firstNode.previousNode = this.temp;
+        this.firstNode = this.temp;
+        this.length++;
+    }
+
+    appendToEnd(content) {
+        this.temp = new PathNode(content, this.lastNode, null);
+        this.lastNode.nextNode = this.temp;
+        this.lastNode = this.temp;
+        this.length++;
     }
 
     appendAndRemove(content) {
@@ -494,6 +538,20 @@ class Path {
         this.firstNode.previousNode = null;
         this.lastNode.nextNode = null;
         this.firstNode.content = content;
+    }
+
+    changeLength(newLength) {
+        let lengthDifference = newLength - this.length;
+        if (lengthDifference < 0) {
+            for (let i = 0; i < (-lengthDifference); i++) {
+               this.removeLast();
+            }
+        } else if (lengthDifference > 0) {
+            let content = this.firstNode.content;
+            for (let i = 0; i < lengthDifference; i++) {
+                this.appendToStart([content[0], content[1]]);
+            }
+        }
     }
 
     shift(displacement) {
@@ -568,5 +626,9 @@ class WaveformManager {
 
         this.sideDrawing.draw();
         this.profileDrawing.draw();
+    }
+
+    changeSpeed() {
+        this.sideDrawing.changeSpeed();
     }
 }
