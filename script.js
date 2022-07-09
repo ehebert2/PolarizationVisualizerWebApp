@@ -39,12 +39,20 @@ window.onresize = function () {
 function resetCanvasSizes() {
     if (window.width > window.height) {
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
-        (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
+            (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
             if (!document.fullscreenElement) {
-                document.getElementById("main_container").requestFullscreen().catch(err => {
+                window.alert("trying to set full screen");
+                document.getElementById("main_container").requestFullscreen('hide').catch(err => {
                     alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
                 });
             } else {
+                document.exitFullscreen();
+            }
+        }
+    } else {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ||
+            (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.platform))) {
+            if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
         }
