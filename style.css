@@ -115,6 +115,7 @@ canvas.viewport {
     border-color: var(--border_color_1);
     border-width: 3px;
     line-height: 1.5;
+    overflow: auto;
 }
 
 .phase_box {
@@ -160,7 +161,8 @@ canvas.viewport {
 
 @media (orientation: portrait) {
     .ui_container {
-        flex-direction: column-reverse;
+        display: grid;
+        grid-template-rows: 3fr 2fr;
     }
 
     .profile_holder {
@@ -168,10 +170,11 @@ canvas.viewport {
     }
 
     .div.visualizer_container {
-        flex: 4;
+        order: 0;
     }
 
     .controls {
-        flex: 1;
+        order: 1;
+        overflow: auto;
     }
 }
