@@ -14,8 +14,8 @@
         <div class="ui_container" id="main_container">
             <div class="controls">
                 <p class="control_header">Initial Polarization State</p>
-                <form class="control_panel">
-                    <p style="text-align: left;">
+                <form class="control_panel" title="Controls defining initial polarization state.">
+                    <p style="text-align: left;" title="Starting polarization type.">
                         <input type="radio" id="linear" name="in_pol_type" value="LINEAR" checked="checked" onchange="changePolarizationType(this)" />
                         <label for="linear">Linear</label><br />
                         <input type="radio" id="lhcp" name="in_pol_type" value="LHCP" onchange="changePolarizationType(this)" />
@@ -27,53 +27,59 @@
                     </p>
                     <p style="text-align: right;">
                         <label for="input_angle">Polarization Angle (deg): </label>
-                        <input class="phase_box" type="number" id="input_angle" min="-360" max="360" value="45" size="4" maxlength="4" onchange="changePolarizationAngle()" /><br />
+                        <input class="phase_box" type="number" id="input_angle" min="-360" max="360" value="45" size="4" 
+                               maxlength="4" onchange="changePolarizationAngle()" title="Initial polarization angle (in degrees) counterclockwise of x axis." /><br />
                         <label for="input_delay">Initial Phase Offset (deg): </label>
-                        <input class="phase_box" type="number" id="input_delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeInitialDelay()"/><br />                        
+                        <input class="phase_box" type="number" id="input_delay" min="-360" max="360" value="0" size="4" 
+                               maxlength="4" onchange="changeInitialDelay()" title="Delay added to x-component of initial waveform (in degrees)." /><br />                        
                     </p>
                 </form>
                 <p class="control_header">Polarization Modifications</p>
-                <form class="control_panel">
+                <form class="control_panel" title="Changes between initial and final polarization states.">
                     <label for="delay">Delay (deg): </label>
-                    <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changeDelay()" /><br />
-                    <label for="polarizer_angle">Polarizer Angle</label>
-                    <input class="phase_box" type="number" id="polarizer_angle" min="-360" max="360" value="0" size="4" maxlength="4" onchange="changerPolarizerAngle()" /><br />
+                    <input class="phase_box" type="number" id="delay" min="-360" max="360" value="0" size="4" 
+                           maxlength="4" onchange="changeDelay()" title="Delay added to x component of final waveform (in degrees)." /><br />
+                    <label for="polarizer_angle">Polarizer Angle: </label>
+                    <input class="phase_box" type="number" id="polarizer_angle" min="-360" max="360" value="0" size="4" 
+                           maxlength="4" onchange="changerPolarizerAngle()" title="Angle of polarizer counterclockwise of x-axis (in degrees)." /><br />
                     <label for="polarizerOn">Insert Polarizer</label>
-                    <input type="checkbox" id="polarizerOn" onclick="polarizerToggle()" />
+                    <input type="checkbox" id="polarizerOn" onclick="polarizerToggle()" title="Adds a linear polarizer at the specified angle. The final waveform before passing through the polarizer is blue while after the polarizer is orange" />
                 </form>
                 <p class="control_header">Wave Properties</p>
-                <form class="control_panel">
-                    <label for="wave_speed">Phase Velocity (px/frame): </label><br />
-                    <input class="phase_box" type="number" id="wave_speed" min="0" max="100" value="3" size="4" maxlength="4" onchange="changeSpeed()" /> <br />
-                    <label for="frequency">Frequency (Hz): </label><br />
-                    <input class="phase_box" type="number" id="frequency" min="0" max="60" value="0.4" size="4" maxlength="4" onchange="changeFrequency()" />
+                <form class="control_panel" title="Edit speed of light and frequency of the waves.">
+                    <label for="wave_speed">Phase Velocity (px/frame): </label>
+                    <input class="phase_box" type="number" id="wave_speed" min="0" max="100" value="3" size="4" 
+                           maxlength="4" onchange="changeSpeed()" title="The phase velocity of the wave (in pixels per rendered frame). Large changes can take a moment to resolve." /> <br />
+                    <label for="frequency">Frequency (Hz): </label>
+                    <input class="phase_box" type="number" id="frequency" min="0" max="60" value="0.4" size="4" 
+                           maxlength="4" onchange="changeFrequency()" title="The frequency of the wave (in Hz). Only values above 0 are accepted. The framerate is 60hz, so anything above that will be aliased down." />
                 </form>
             </div>
-            <div class="visualizer_container">
+            <div class="visualizer_container" title="Blue is the waveform. Red is the x-axis projection. Green is the y-axis projection. Orange is the projection onto the polarization axis (if enabled).">
                 <div class="visualizer_pair_container">
                     <div class="profile_holder">
-                        <p class="visualizer_header">Initial (profile View)</p>
-                        <div class="profile">
+                        <p class="visualizer_header">(profile View)</p>
+                        <div class="profile" title="View of the initial polarization state looking down the optic axis (the line that the wave is traveling along).">
                             <canvas class="profile" width="50" height="50" id="profile_initial"></canvas>
                         </div>
                     </div>
                     <div class="viewport_holder">
-                        <p class="visualizer_header">Initial (Side View)</p>
-                        <div class="viewport">
+                        <p class="visualizer_header">Initial Polarization State (Side View)</p>
+                        <div class="viewport" title="Psuedo 3D rendering of the initial polarization state.">
                             <canvas class="viewport" width="50" height="50" id="viewport_initial"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="visualizer_pair_container">
                     <div class="profile_holder">
-                        <p class="visualizer_header">Final (profile View)</p>
-                        <div class="profile">
+                        <p class="visualizer_header">(profile View)</p>
+                        <div class="profile" title="View of the final polarization state looking down the optic axis (the line that the wave is traveling along)."">
                             <canvas class="profile" width="50" height="50" id="profile_final"></canvas>
                         </div>
                     </div>
                     <div class="viewport_holder">
-                        <p class="visualizer_header">Final (Side View)</p>
-                        <div class="viewport">
+                        <p class="visualizer_header">Final Polarization State (Side View)</p>
+                        <div class="viewport" title="Psuedo 3D rendering of the final polarization state.">
                             <canvas class="viewport" width="50" height="50" id="viewport_final"></canvas>
                         </div>
                     </div>
