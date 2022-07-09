@@ -170,7 +170,7 @@ canvas.viewport {
 
     .ui_container {
         display: grid;
-        grid-template-rows: 3fr 2fr;
+        grid-template-rows: 2fr 3fr;
     }
 
     .profile_holder {

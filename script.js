@@ -263,8 +263,6 @@ class ProfileDrawing {
         this.context = this.canvas.getContext('2d');
 
         this.axisWidth = (this.canvas.width > this.canvas.height) ? Math.round((this.canvas.height - yTextPadding - 3 * padding) / 2) : Math.round((this.canvas.width - xTextPadding - 3 * padding) / 2);
-        //this.xCenter = Math.round((this.canvas.width) / 2) - xTextPadding - padding;
-        //this.yCenter = Math.round(this.canvas.height / 2) + yTextPadding + padding;
         this.xCenter = padding + this.axisWidth;
         this.yCenter = 2 * padding + yTextPadding + this.axisWidth;
 
