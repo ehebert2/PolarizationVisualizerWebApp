@@ -157,6 +157,10 @@ canvas.viewport {
     .visualizer_container {
         height: 100vh;
     }
+
+    .controls {
+        overflow: auto;
+    }
 }
 
 @media (orientation: portrait) {
