@@ -355,7 +355,7 @@ function configureWaveformManagers() {
             finalWaveformManager.lMag = lMag;
             finalWaveformManager.rMag = rMag;
             finalWaveformManager.ldelay = ldelay;
-            finalWaveformManager.rdelay = rdelay;
+            finalWaveformManager.rdelay = rdelay + delay * Math.PI / 180;
         }
     } else {
         initialWaveformManager.circBasis = false;
