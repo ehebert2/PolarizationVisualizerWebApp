@@ -22,6 +22,16 @@ var inputDelay = 0;
 var polAngle = 45;
 var polarizerAngle = 0;
 var polarizerOn = false;
+var circBasis = false;
+
+// helper variables so that I don't have to constantly reinitialize
+var Ex = 0;
+var Ey = 0;
+var lMag = 0;
+var rMag = 0;
+var ldelay = 0;
+var rdelay = 0;
+var delayRad = 0;
 
 // variables for drawing and placement
 // xTextPadding and yTextPadding should be overwritten while running based on screen textsizes
@@ -176,6 +186,16 @@ function changePolarizationType(radio) {
     }
 }
 
+function changeBasis(radio) {
+    if (radio.value == "CART") {
+        circBasis = false;
+        configureWaveformManagers();
+    } else if (radio.value == "CIRC") {
+        circBasis = true;
+        configureWaveformManagers();
+    }
+}
+
 // changes the input polarization angle
 // only applies to linear and arbitrary polarization states
 function changePolarizationAngle() {
@@ -279,34 +299,96 @@ function checkNumber(elem, def) {
 // sometimes also called to make sure that waveform managers are in sync with global variables
 // set by user
 function configureWaveformManagers() {
-    if (state == LINEAR) {
-        initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
-        initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
-        initialWaveformManager.delay = 0;
-        finalWaveformManager.xMag = initialWaveformManager.xMag;
-        finalWaveformManager.yMag = initialWaveformManager.yMag;
-        finalWaveformManager.delay = delay * Math.PI / 180;
-    } else if (state == LHCP) {
-        initialWaveformManager.xMag = Math.sqrt(2) / 2;
-        initialWaveformManager.yMag = Math.sqrt(2) / 2;
-        initialWaveformManager.delay = -Math.PI / 2;
-        finalWaveformManager.xMag = Math.sqrt(2) / 2;
-        finalWaveformManager.yMag = Math.sqrt(2) / 2;
-        finalWaveformManager.delay = -Math.PI / 2 + delay * Math.PI / 180;
-    } else if (state == RHCP) {
-        initialWaveformManager.xMag = Math.sqrt(2) / 2;
-        initialWaveformManager.yMag = Math.sqrt(2) / 2;
-        initialWaveformManager.delay = Math.PI / 2;
-        finalWaveformManager.xMag = Math.sqrt(2) / 2;
-        finalWaveformManager.yMag = Math.sqrt(2) / 2;
-        finalWaveformManager.delay = Math.PI / 2 + delay * Math.PI / 180;
-    } else if (state == ARB) {
-        initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
-        initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
-        initialWaveformManager.delay = inputDelay * Math.PI / 180;
-        finalWaveformManager.xMag = initialWaveformManager.xMag;
-        finalWaveformManager.yMag = initialWaveformManager.yMag;
-        finalWaveformManager.delay = ((inputDelay + delay) * Math.PI / 180);
+    // if circular polarization basis is selected, need to transform appropriately
+    if (circBasis) {
+        initialWaveformManager.circBasis = true;
+        finalWaveformManager.circBasis = true;
+
+        if (state == LINEAR) {
+            Ex = Math.cos(Math.PI * polAngle / 180);
+            Ey = Math.sin(Math.PI * polAngle / 180);
+            lMag = (1 / 2) * Math.sqrt(Ey ** 2 + Ex ** 2);
+            rMag = lMag;
+            ldelay = Math.atan2(Ex, Ey);
+            rdelay = Math.atan2(-Ex, Ey);
+
+            initialWaveformManager.lMag = lMag;
+            initialWaveformManager.rMag = rMag;
+            initialWaveformManager.ldelay = ldelay;
+            initialWaveformManager.rdelay = rdelay;
+            finalWaveformManager.lMag = lMag;
+            finalWaveformManager.rMag = rMag;
+            finalWaveformManager.ldelay = ldelay;
+            finalWaveformManager.rdelay = rdelay + delay * Math.PI / 180;
+        } else if (state == LHCP) {
+            initialWaveformManager.lMag = 1/Math.sqrt(2);
+            initialWaveformManager.rMag = 0;
+            initialWaveformManager.ldelay = 0;
+            initialWaveformManager.rdelay = 0;
+            finalWaveformManager.lMag = 1/Math.sqrt(2);
+            finalWaveformManager.rMag = 0;
+            finalWaveformManager.ldelay = 0;
+            finalWaveformManager.rdelay = delay * Math.PI / 180;
+        } else if (state == RHCP) {
+            initialWaveformManager.lMag = 0;
+            initialWaveformManager.rMag = 1/Math.sqrt(2);
+            initialWaveformManager.ldelay = 0;
+            initialWaveformManager.rdelay = 0;
+            finalWaveformManager.lMag = 0;
+            finalWaveformManager.rMag = 1/Math.sqrt(2);
+            finalWaveformManager.ldelay = 0;
+            finalWaveformManager.rdelay = delay * Math.PI / 180;
+        } else if (state == ARB) {
+            Ex = Math.cos(Math.PI * polAngle / 180);
+            Ey = Math.sin(Math.PI * polAngle / 180);
+            delayRad = inputDelay * Math.PI / 180;
+            lMag = (1 / 2) * Math.sqrt((Ey - Ex * Math.sin(delayRad)) ** 2 + (Ex * Math.cos(delayRad)) ** 2);
+            rMag = (1 / 2) * Math.sqrt((Ey + Ex * Math.sin(delayRad)) ** 2 + (Ex * Math.cos(delayRad)) ** 2);
+            ldelay = Math.atan2(Ex * Math.cos(delayRad), (Ey - Ex * Math.sin(delayRad)));
+            rdelay = Math.atan2(-Ex * Math.cos(delayRad), (Ey + Ex * Math.sin(delayRad)));
+
+            initialWaveformManager.lMag = lMag;
+            initialWaveformManager.rMag = rMag;
+            initialWaveformManager.ldelay = ldelay;
+            initialWaveformManager.rdelay = rdelay;
+            finalWaveformManager.lMag = lMag;
+            finalWaveformManager.rMag = rMag;
+            finalWaveformManager.ldelay = ldelay;
+            finalWaveformManager.rdelay = rdelay;
+        }
+    } else {
+        initialWaveformManager.circBasis = false;
+        finalWaveformManager.circBasis = false;
+
+        if (state == LINEAR) {
+            initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
+            initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
+            initialWaveformManager.delay = 0;
+            finalWaveformManager.xMag = initialWaveformManager.xMag;
+            finalWaveformManager.yMag = initialWaveformManager.yMag;
+            finalWaveformManager.delay = delay * Math.PI / 180;
+        } else if (state == LHCP) {
+            initialWaveformManager.xMag = Math.sqrt(2) / 2;
+            initialWaveformManager.yMag = Math.sqrt(2) / 2;
+            initialWaveformManager.delay = -Math.PI / 2;
+            finalWaveformManager.xMag = Math.sqrt(2) / 2;
+            finalWaveformManager.yMag = Math.sqrt(2) / 2;
+            finalWaveformManager.delay = -Math.PI / 2 + delay * Math.PI / 180;
+        } else if (state == RHCP) {
+            initialWaveformManager.xMag = Math.sqrt(2) / 2;
+            initialWaveformManager.yMag = Math.sqrt(2) / 2;
+            initialWaveformManager.delay = Math.PI / 2;
+            finalWaveformManager.xMag = Math.sqrt(2) / 2;
+            finalWaveformManager.yMag = Math.sqrt(2) / 2;
+            finalWaveformManager.delay = Math.PI / 2 + delay * Math.PI / 180;
+        } else if (state == ARB) {
+            initialWaveformManager.xMag = Math.cos(Math.PI * polAngle / 180);
+            initialWaveformManager.yMag = Math.sin(Math.PI * polAngle / 180);
+            initialWaveformManager.delay = inputDelay * Math.PI / 180;
+            finalWaveformManager.xMag = initialWaveformManager.xMag;
+            finalWaveformManager.yMag = initialWaveformManager.yMag;
+            finalWaveformManager.delay = ((inputDelay + delay) * Math.PI / 180);
+        }
     }
 
     if (polarizerOn) {
@@ -408,6 +490,16 @@ class ProfileDrawing {
         } else {
             this.xPath.appendAndRemove([this.point[0], this.yCenter]);
             this.yPath.appendAndRemove([this.xCenter, this.point[1]]);
+        }
+    }
+
+    addPointCirc(x1, y1, x2, y2, x3, y3) {
+        if (this.polarizerOn) {
+            this.addPoint(x1, y1);
+        } else {
+            this.xyPath.appendAndRemove([Math.round(this.xCenter + this.axisWidth * x1), Math.round(this.yCenter - this.axisWidth * y1)]);
+            this.xPath.appendAndRemove([Math.round(this.xCenter + this.axisWidth * x2), Math.round(this.yCenter - this.axisWidth * y2)]);
+            this.yPath.appendAndRemove([Math.round(this.xCenter + this.axisWidth * x3), Math.round(this.yCenter - this.axisWidth * y3)]);
         }
     }
 
@@ -542,6 +634,19 @@ class SideDrawing {
             this.xPath.appendAndRemove([this.realX, this.realY]);
 
             this.getRealCoord(0, y, z);
+            this.yPath.appendAndRemove([this.realX, this.realY]);
+        }
+    }
+
+    addPointCirc(x1, y1, x2, y2, x3, y3, z) {
+        if (this.polarizerOn) {
+            this.addPoint(x1, y1, z);
+        } else {
+            this.getRealCoord(x1, y1, z);
+            this.xyPath.appendAndRemove([this.realX, this.realY]);
+            this.getRealCoord(x2, y2, z);
+            this.xPath.appendAndRemove([this.realX, this.realY]);
+            this.getRealCoord(x3, y3, z);
             this.yPath.appendAndRemove([this.realX, this.realY]);
         }
     }
@@ -728,6 +833,11 @@ class WaveformManager {
         this.delay = delay;
         this.xMag = xMag;
         this.yMag = yMag;
+        this.circBasis = false;
+        this.rdelay = 0;
+        this.ldelay = 0;
+        this.rMag = 1/2;
+        this.lMag = 1/2;
     }
 
     // update and draw function used in animation loop
@@ -738,15 +848,26 @@ class WaveformManager {
         // shift 3D view to make it look like wave is moving
         this.sideDrawing.shift(c);
 
-        // calculate normalized coordinates of polarization state
-        this.phase = 2 * Math.PI * this.frequency * this.frame / FPS;
-        this.x0 = this.xMag*Math.sin(this.phase - this.delay);
-        this.y0 = this.yMag*Math.sin(this.phase);
+        
+        if (this.circBasis) {
+            this.phase = 2 * Math.PI * this.frequency * this.frame / FPS;
+            this.x2 = this.rMag * Math.sin(this.phase - Math.PI / 2 - this.rdelay);
+            this.y2 = this.rMag * Math.sin(this.phase - this.rdelay);
+            this.x3 = this.lMag * Math.sin(this.phase + Math.PI / 2 - this.ldelay);
+            this.y3 = this.lMag * Math.sin(this.phase - this.ldelay);
 
-        // update drawing objects with normalized coordinates
-        this.sideDrawing.addPoint(this.x0, this.y0, 0);
-        this.profileDrawing.addPoint(this.x0, this.y0);
+            this.profileDrawing.addPointCirc((this.x2 + this.x3), (this.y2 + this.y3), this.x2, this.y2, this.x3, this.y3);
+            this.sideDrawing.addPointCirc((this.x2 + this.x3), (this.y2 + this.y3), this.x2, this.y2, this.x3, this.y3, 0);
+        } else {
+            // calculate normalized coordinates of polarization state
+            this.phase = 2 * Math.PI * this.frequency * this.frame / FPS;
+            this.x0 = this.xMag * Math.sin(this.phase - this.delay);
+            this.y0 = this.yMag * Math.sin(this.phase);
 
+            // update drawing objects with normalized coordinates
+            this.sideDrawing.addPoint(this.x0, this.y0, 0);
+            this.profileDrawing.addPoint(this.x0, this.y0);
+        }
         // draw
         this.sideDrawing.draw();
         this.profileDrawing.draw();

@@ -54,6 +54,13 @@
                     <input class="phase_box" type="number" id="frequency" min="0" max="60" value="0.4" size="4" 
                            maxlength="4" onchange="changeFrequency()" title="The frequency of the wave (in Hz). Only values above 0 are accepted. The framerate is 60hz, so anything above that will be aliased down." />
                 </form>
+                <p class="controls_header">Component Basis</p>
+                <form class="control_panel" title="Change between cartesian basis and left/right circular basis. For circular basis, arbitrary waveform parameters are still defined in terms of the cartesian basis. The delay term between final and initial states is applied to the right hand circular componenent.">
+                    <input type="radio" id="x/y" name="basis_type" value="CART" checked="checked" onchange="changeBasis(this)" />
+                    <label for="x/y">x/y</label><br />
+                    <input type="radio" id="l/r" name="basis_type" value="CIRC" onchange="changeBasis(this)" />
+                    <label for="l/r">l/r</label>
+                </form>
             </div>
             <div class="visualizer_container" title="Blue is the waveform. Red is the x-axis projection. Green is the y-axis projection. Orange is the projection onto the polarization axis (if enabled).">
                 <div class="visualizer_pair_container">
