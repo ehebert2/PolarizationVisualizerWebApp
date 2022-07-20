@@ -145,6 +145,7 @@ function initialize() {
     document.getElementById('polarizer_angle').disabled = true;
     document.getElementById('wave_speed').value = c;
     document.getElementById('frequency').value = frequency;
+    document.getElementById('x/y').checked = true;
 
     setupCanvas();
 }
